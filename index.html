@@ -6,6 +6,8 @@
     <title>VocabMaster</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     
@@ -108,6 +110,10 @@
         .success-glow {
             background: radial-gradient(circle, rgba(0, 71, 165, 0.08) 0%, rgba(249, 249, 249, 0) 70%);
         }
+        .circular-progress {
+            background: radial-gradient(closest-side, white 82%, transparent 80% 100%),
+                        conic-gradient(#0047a5 68%, #e2e2e2 0);
+        }
     </style>
 </head>
 <body class="bg-surface text-on-surface flex flex-col items-center selection:bg-secondary-container selection:text-on-secondary-container antialiased">
@@ -125,10 +131,11 @@
                     <p class="text-on-surface-variant text-base font-medium">Please enter your details to continue.</p>
                 </div>
                 
-                <form class="space-y-6" onsubmit="event.preventDefault();">
+                <form class="space-y-6" onsubmit="handleLogin(event)">
+                    <p id="loginError" class="hidden text-error text-sm font-bold text-center bg-error-container/20 p-2 rounded-lg"></p>
                     <div class="space-y-5">
                         <div class="relative group">
-                            <input class="w-full h-16 px-6 bg-surface-container-high border-none rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Username" type="text" required/>
+                            <input id="loginIdentifier" class="w-full h-16 px-6 bg-surface-container-high border-none rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Username, Email or Phone" type="text" required/>
                         </div>
                         <div class="relative group">
                             <input id="loginPassword" class="w-full h-16 px-6 bg-surface-container-high border-none rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Password" type="password" required/>
@@ -140,7 +147,7 @@
 
                     <div class="flex items-center justify-between px-1">
                         <label class="flex items-center space-x-3 cursor-pointer group">
-                            <input class="peer appearance-none w-6 h-6 border-2 border-outline-variant rounded-lg checked:bg-primary checked:border-primary transition-all cursor-pointer focus:ring-2 focus:ring-primary/20" type="checkbox"/>
+                            <input id="rememberMe" class="peer appearance-none w-6 h-6 border-2 border-outline-variant rounded-lg checked:bg-primary checked:border-primary transition-all cursor-pointer focus:ring-2 focus:ring-primary/20" type="checkbox"/>
                             <span class="text-base font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">Remember Me</span>
                         </label>
                         <a class="text-base font-semibold text-primary hover:text-primary-container transition-colors" href="#">Forgot Password?</a>
@@ -181,16 +188,16 @@
                 <p class="text-on-surface-variant text-base font-medium">Begin your intellectual journey today</p>
             </div>
 
-            <form class="w-full space-y-5" onsubmit="event.preventDefault(); showView('successView');">
+            <form class="w-full space-y-5" onsubmit="handleRegister(event)">
                 <div class="space-y-4">
-                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Full Name" type="text" required/>
-                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" onblur="(this.type='text')" onfocus="(this.type='date')" placeholder="Date of Birth" type="text" required/>
-                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Country" type="text" required/>
-                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Email" type="email" required/>
-                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Phone Number" type="tel" required/>
-                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Username" type="text" required/>
+                    <input name="fullname" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Full Name" type="text" required/>
+                    <input name="dob" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" onblur="(this.type='text')" onfocus="(this.type='date')" placeholder="Date of Birth" type="text" required/>
+                    <input name="country" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Country" type="text" required/>
+                    <input name="email" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Email" type="email" required/>
+                    <input name="phone" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Phone Number" type="tel" required/>
+                    <input name="username" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Username" type="text" required/>
                     <div class="relative">
-                        <input id="registerPassword" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Password" type="password" required/>
+                        <input name="password" id="registerPassword" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Password" type="password" required/>
                         <button onclick="togglePasswordVisibility('registerPassword', 'registerPasswordIcon')" class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-primary transition-colors focus:outline-none" type="button">
                             <span id="registerPasswordIcon" class="material-symbols-outlined text-[22px]">visibility</span>
                         </button>
@@ -200,22 +207,23 @@
                 <div class="pt-2 space-y-4">
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-[20px]">public</span>
-                        <select class="w-full h-14 pl-12 pr-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface text-lg appearance-none outline-none">
-                            <option disabled selected>Language to Learn</option>
-                            <option>Korean</option>
+                        <select name="learn_lang" class="w-full h-14 pl-12 pr-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface text-lg appearance-none outline-none">
+                            <option disabled selected value="">Language to Learn</option>
+                            <option value="ko">Korean</option>
                         </select>
                         <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
                     </div>
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-[20px]">translate</span>
-                        <select class="w-full h-14 pl-12 pr-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface text-lg appearance-none outline-none">
-                            <option disabled selected>Your Native Language</option>
-                            <option>Indonesian</option>
-                            <option>Russian</option>
-                            <option>Thai</option>
-                            <option>Spanish</option>
-                            <option>Chinese</option>
-                            <option>Turkish</option>
+                        <select name="native_lang" class="w-full h-14 pl-12 pr-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface text-lg appearance-none outline-none">
+                            <option disabled selected value="">Your Native Language</option>
+                            <option value="id">Indonesian</option>
+                            <option value="ru">Russian</option>
+                            <option value="th">Thai</option>
+                            <option value="es">Spanish</option>
+                            <option value="zh">Chinese</option>
+                            <option value="tr">Turkish</option>
+                            <option value="en">English</option>
                         </select>
                         <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
                     </div>
@@ -277,16 +285,185 @@
         </main>
     </div>
 
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" class="hidden w-full flex flex-col view-transition min-h-screen">
+        <!-- TopAppBar -->
+        <header class="bg-[#f9f9f9] border-b border-[#eeeeee] sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+            <div class="flex items-center gap-3">
+                <img alt="VocabMaster Logo" class="w-8 h-8 rounded-lg object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0uhv8ZVMfNGOiYIK3AaxpGGIMUye9zsdBFROhtW8CRYIGG6hdGQ7xpnBKRVjt3PmkYOdKpeT05SZlGw-tToprGsI-eDyjSFQKlZJ4E8LqAWu1ggr1nNC6k4pJyhVm5PO1hIoA6qEgWnq-lsOlIHsDTBkbO_lKjaPbgJhTbob7N2PdnANW5hj6GWfUDiJJxUaPfvUH2eU32BEFnJg-OF9s1yVznpa2WNXPOCUdVmiRQ1EWLeMr1NxjFnyTVZeqWViwksuZ7Zu53NUnn0"/>
+                <span class="text-[#1a1c1c] font-bold text-xl tracking-tighter">VocabMaster</span>
+            </div>
+            <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors active:opacity-80 active:scale-95 duration-200">
+                <span class="material-symbols-outlined text-[#434652]">settings</span>
+            </button>
+        </header>
+        
+        <main class="max-w-md mx-auto px-6 pt-8 pb-32 w-full">
+            <!-- Hero Section -->
+            <section class="flex flex-col items-center mb-10">
+                <div class="relative w-48 h-48 rounded-full circular-progress flex items-center justify-center transition-all duration-700 ease-out">
+                    <div class="text-center">
+                        <div class="text-5xl font-extrabold text-primary tracking-tight">68%</div>
+                        <div class="text-[10px] font-bold text-on-surface-variant tracking-[0.1em] mt-1 uppercase">Overall Mastery</div>
+                    </div>
+                </div>
+                <button class="mt-8 px-10 py-4 luminous-cta text-white font-bold rounded-xl shadow-lg shadow-primary/20 active:scale-95 transition-all duration-200 uppercase tracking-widest text-sm">
+                    START PRACTICE
+                </button>
+            </section>
+            
+            <!-- Statistic Cards Bento -->
+            <section class="grid grid-cols-2 gap-4 mb-10">
+                <div class="col-span-2 bg-white p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col items-center justify-center">
+                    <span class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">TOTAL CARDS</span>
+                    <span class="text-4xl font-extrabold text-primary tracking-tighter">1,247</span>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+                    <span class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-2 block">WEAK ITEMS</span>
+                    <div class="flex items-end justify-between">
+                        <span class="text-3xl font-extrabold text-orange-600 tracking-tight">312</span>
+                        <span class="material-symbols-outlined text-orange-600/30 mb-1">trending_down</span>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+                    <span class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-2 block">MASTERED</span>
+                    <div class="flex items-end justify-between">
+                        <span class="text-3xl font-extrabold text-emerald-600 tracking-tight">420</span>
+                        <span class="material-symbols-outlined text-emerald-600/30 mb-1">verified</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Mastery Distribution -->
+            <section id="distributionSection">
+                <div class="flex justify-between items-end mb-6">
+                    <h2 class="text-xl font-extrabold text-primary tracking-tight">Mastery Distribution</h2>
+                    <span class="text-xs font-bold text-primary cursor-pointer hover:underline uppercase">VIEW ALL</span>
+                </div>
+                <div class="space-y-3">
+                    <!-- Level 5 -->
+                    <div class="group bg-white p-4 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex items-center gap-4 transition-all hover:bg-surface-container-low cursor-pointer">
+                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-bold text-on-surface">81-100%</span>
+                                <span class="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase">214 CARDS</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                                <div class="bg-emerald-500 h-full w-[85%] rounded-full"></div>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+                    </div>
+                    <!-- Level 4 -->
+                    <div class="group bg-white p-4 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex items-center gap-4 transition-all hover:bg-surface-container-low cursor-pointer">
+                        <div class="w-2.5 h-2.5 rounded-full bg-primary shrink-0"></div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-bold text-on-surface">61-80%</span>
+                                <span class="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase">412 CARDS</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                                <div class="bg-primary h-full w-[65%] rounded-full"></div>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vocabulary List Section (Supabase Integration) -->
+            <section class="mt-10">
+                <div class="flex justify-between items-end mb-6">
+                    <h2 class="text-xl font-extrabold text-primary tracking-tight">Your Vocabulary</h2>
+                    <button onclick="fetchVocabulary()" class="text-xs font-bold text-primary flex items-center gap-1 uppercase">REFRESH <span class="material-symbols-outlined text-[14px]">refresh</span></button>
+                </div>
+                <div id="vocabularyList" class="space-y-4">
+                    <!-- Data will be loaded here -->
+                    <div class="text-center py-10 opacity-50 italic">Loading your words...</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- BottomNavBar -->
+        <nav class="bg-white/80 backdrop-blur-xl border-t border-[#eeeeee] shadow-[0_-4px_24px_rgba(0,0,0,0.04)] fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 h-20 z-50">
+            <button onclick="showView('dashboardView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group">
+                <span class="material-symbols-outlined text-xl mb-0.5" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest">PRACTICE</span>
+            </button>
+            <button onclick="showView('dashboardView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group">
+                <span class="material-symbols-outlined text-xl mb-0.5">book</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest">DICTIONARY</span>
+            </button>
+            <button onclick="showView('addView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group">
+                <div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-white shadow-lg -mt-10 mb-1 transition-transform group-active:scale-90">
+                    <span class="material-symbols-outlined text-2xl">add</span>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-widest">ADD</span>
+            </button>
+            <button onclick="showView('dashboardView')" class="flex flex-col items-center justify-center bg-[#0047a5]/10 text-[#003278] rounded-xl px-3 py-1.5 transition-colors group">
+                <span class="material-symbols-outlined text-xl mb-0.5" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest">DASHBOARD</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ADD VIEW -->
+    <div id="addView" class="hidden w-full flex flex-col view-transition min-h-screen bg-surface">
+        <header class="bg-[#f9f9f9] border-b border-[#eeeeee] sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+            <button onclick="showView('dashboardView')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                <span class="material-symbols-outlined text-primary text-[28px]">arrow_back</span>
+            </button>
+            <div class="text-2xl font-extrabold tracking-tighter text-primary">Add Word</div>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="max-w-md mx-auto px-6 pt-10 pb-32 w-full">
+            <div class="text-center mb-8">
+                <p class="text-on-surface-variant font-medium">Add a new Korean word to your collection</p>
+            </div>
+
+            <form id="addWordForm" class="space-y-8" onsubmit="handleAddNewWord(event)">
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-on-surface-variant uppercase ml-2 tracking-widest">Korean Word</label>
+                        <input name="korean_word" class="w-full h-16 px-6 bg-white border border-outline-variant/30 rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm" placeholder="e.g. 안녕하세요" required />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-on-surface-variant uppercase ml-2 tracking-widest">Translation</label>
+                        <input name="translated_text" class="w-full h-16 px-6 bg-white border border-outline-variant/30 rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm" placeholder="e.g. Hello" required />
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full h-16 luminous-cta text-white font-bold rounded-full text-lg tracking-widest shadow-xl active:scale-[0.98] transition-all">
+                        SAVE VOCABULARY
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+
     <!-- Footer -->
-    <footer class="pb-8 mt-auto">
+    <footer id="mainFooter" class="pb-8 mt-auto">
         <p class="text-xs text-on-surface-variant/50 font-medium">© 2026 VocabMaster. All rights reserved.</p>
     </footer>
 
     <script>
+        const supabaseUrl = 'https://qeiciiwcoesrxrjnuwqu.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlaWNpaXdjb2Vzcnhyam51d3F1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0ODE1OTQsImV4cCI6MjA5MTA1NzU5NH0.zDmC6DhksA1zNwqOejDolfqBGeijmo4twEX64iqMwpA';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let userNativeLang = 'en';
+
         function showView(viewId) {
-            const views = ['loginView', 'registerView', 'successView'];
+            const views = ['loginView', 'registerView', 'successView', 'successView', 'dashboardView', 'addView'];
+            const footer = document.getElementById('mainFooter');
+            
             views.forEach(id => {
                 const el = document.getElementById(id);
+                if (!el) return;
                 if (id === viewId) {
                     el.classList.remove('hidden');
                     setTimeout(() => {
@@ -299,8 +476,154 @@
                     setTimeout(() => el.classList.add('hidden'), 300);
                 }
             });
+
+            if (viewId === 'dashboardView' || viewId === 'addView') {
+                footer.classList.add('hidden');
+            } else {
+                footer.classList.remove('hidden');
+            }
+
             window.scrollTo(0, 0);
         }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const identifier = document.getElementById('loginIdentifier').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: identifier,
+                password: password,
+            });
+
+            if (error) {
+                errorEl.textContent = error.message;
+                errorEl.classList.remove('hidden');
+                const form = event.target;
+                form.style.animation = 'shake 0.4s ease-in-out';
+                setTimeout(() => form.style.animation = '', 400);
+            } else {
+                currentUser = data.user;
+                userNativeLang = data.user.user_metadata.native_lang || 'en';
+                errorEl.classList.add('hidden');
+                showView('dashboardView');
+                fetchVocabulary();
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const native_lang = formData.get('native_lang');
+            const fullname = formData.get('fullname');
+
+            const { data, error } = await _supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        fullname,
+                        native_lang: native_lang || 'en'
+                    }
+                }
+            });
+
+            if (error) {
+                alert("Error registering: " + error.message);
+            } else {
+                showView('successView');
+            }
+        }
+
+        async function handleAddNewWord(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const korean_word = formData.get('korean_word');
+            const translated_text = formData.get('translated_text');
+
+            try {
+                const { data: word, error: wordError } = await _supabase
+                    .from('words')
+                    .insert([{ korean_word, is_master_data: false }])
+                    .select()
+                    .single();
+
+                if (wordError) throw wordError;
+
+                const { error: transError } = await _supabase
+                    .from('translations')
+                    .insert([{
+                        word_id: word.id,
+                        language_code: userNativeLang,
+                        translated_text: translated_text
+                    }]);
+
+                if (transError) throw transError;
+
+                alert("Word added successfully!");
+                event.target.reset();
+                showView('dashboardView');
+                fetchVocabulary();
+            } catch (err) {
+                alert("Error adding word: " + err.message);
+            }
+        }
+
+        async function fetchVocabulary() {
+            const listEl = document.getElementById('vocabularyList');
+            if (!listEl) return;
+
+            const { data, error } = await _supabase
+                .from('words')
+                .select(`
+                    id,
+                    korean_word,
+                    translations!inner (
+                        translated_text,
+                        language_code
+                    )
+                `)
+                .eq('translations.language_code', userNativeLang);
+
+            if (error) {
+                console.error(error);
+                listEl.innerHTML = `<div class="text-center py-10 text-error">Failed to load data.</div>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                listEl.innerHTML = `<div class="text-center py-10 opacity-50 italic">No words added for your language yet.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = data.map(item => `
+                <div class="bg-white p-5 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex justify-between items-center group transition-all hover:bg-surface-container-low">
+                    <div class="space-y-1">
+                        <div class="text-2xl font-bold text-primary tracking-tight">${item.korean_word}</div>
+                        <div class="text-sm font-semibold text-on-surface-variant uppercase tracking-widest opacity-70">
+                            ${item.translations[0]?.translated_text || 'No translation'}
+                        </div>
+                    </div>
+                    <button class="w-12 h-12 flex items-center justify-center rounded-full bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all">
+                        <span class="material-symbols-outlined text-[24px]">volume_up</span>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                userNativeLang = session.user.user_metadata.native_lang || 'en';
+                showView('dashboardView');
+                fetchVocabulary();
+            }
+        });
 
         function togglePasswordVisibility(inputId, iconId) {
             const input = document.getElementById(inputId);
@@ -313,6 +636,17 @@
                 icon.textContent = 'visibility';
             }
         }
+
+        // Add shake animation style
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-8px); }
+                75% { transform: translateX(8px); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
