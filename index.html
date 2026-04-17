@@ -95,6 +95,19 @@
         .view-transition {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
+        /* Fix for double arrows in select */
+        select {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            background-image: none !important;
+        }
+        select::-ms-expand {
+            display: none !important;
+        }
+        .success-glow {
+            background: radial-gradient(circle, rgba(0, 71, 165, 0.08) 0%, rgba(249, 249, 249, 0) 70%);
+        }
     </style>
 </head>
 <body class="bg-surface text-on-surface flex flex-col items-center selection:bg-secondary-container selection:text-on-secondary-container antialiased">
@@ -168,7 +181,7 @@
                 <p class="text-on-surface-variant text-base font-medium">Begin your intellectual journey today</p>
             </div>
 
-            <form class="w-full space-y-5" onsubmit="event.preventDefault();">
+            <form class="w-full space-y-5" onsubmit="event.preventDefault(); showView('successView');">
                 <div class="space-y-4">
                     <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Full Name" type="text" required/>
                     <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" onblur="(this.type='text')" onfocus="(this.type='date')" placeholder="Date of Birth" type="text" required/>
@@ -188,9 +201,7 @@
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-[20px]">public</span>
                         <select class="w-full h-14 pl-12 pr-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface text-lg appearance-none outline-none">
-                            <option disabled selected>Interface Language</option>
-                            <option>Indonesian</option>
-                            <option>English</option>
+                            <option disabled selected>Language to Learn</option>
                             <option>Korean</option>
                         </select>
                         <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
@@ -198,10 +209,13 @@
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-[20px]">translate</span>
                         <select class="w-full h-14 pl-12 pr-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface text-lg appearance-none outline-none">
-                            <option disabled selected>Translate Vocabulary To</option>
+                            <option disabled selected>Your Native Language</option>
                             <option>Indonesian</option>
-                            <option>English</option>
-                            <option>Korean</option>
+                            <option>Russian</option>
+                            <option>Thai</option>
+                            <option>Spanish</option>
+                            <option>Chinese</option>
+                            <option>Turkish</option>
                         </select>
                         <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
                     </div>
@@ -223,6 +237,46 @@
         </main>
     </div>
 
+    <!-- SUCCESS VIEW -->
+    <div id="successView" class="hidden w-full flex flex-col items-center view-transition min-h-screen relative overflow-hidden pt-20">
+        <!-- Abstract Success Decoration -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-[500px] h-[500px] success-glow rounded-full"></div>
+        </div>
+        
+        <!-- Central Content Cluster -->
+        <main class="flex-grow flex flex-col items-center px-8 relative z-10 w-full">
+            <div class="flex flex-col items-center text-center max-w-md mt-20">
+                <!-- Icon Container -->
+                <div class="relative mb-8">
+                    <div class="w-28 h-28 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined !text-7xl fill-1">check_circle</span>
+                    </div>
+                    <!-- Subtle Orbitals -->
+                    <div class="absolute -top-4 -right-4 w-6 h-6 rounded-full bg-secondary-container opacity-50"></div>
+                    <div class="absolute -bottom-2 -left-8 w-4 h-4 rounded-full bg-tertiary-fixed opacity-30"></div>
+                </div>
+
+                <!-- Typography Cluster -->
+                <div class="space-y-4">
+                    <h2 class="text-4xl font-extrabold text-[#003b93] tracking-tight font-headline">
+                        Account Created!
+                    </h2>
+                    <p class="text-on-surface-variant text-xl leading-relaxed font-body">
+                        You're all set! Your account is ready for your language journey.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="mt-16 w-full max-w-xs">
+                <button onclick="showView('loginView')" class="luminous-cta text-on-primary w-full py-5 rounded-2xl font-bold tracking-widest shadow-xl active:scale-95 transition-transform duration-200 uppercase text-base">
+                    GO TO LOGIN
+                </button>
+            </div>
+        </main>
+    </div>
+
     <!-- Footer -->
     <footer class="pb-8 mt-auto">
         <p class="text-xs text-on-surface-variant/50 font-medium">© 2026 VocabMaster. All rights reserved.</p>
@@ -230,7 +284,7 @@
 
     <script>
         function showView(viewId) {
-            const views = ['loginView', 'registerView'];
+            const views = ['loginView', 'registerView', 'successView'];
             views.forEach(id => {
                 const el = document.getElementById(id);
                 if (id === viewId) {
