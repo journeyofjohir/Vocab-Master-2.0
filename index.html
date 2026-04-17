@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>VocabMaster - Login</title>
+    <title>VocabMaster</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -83,7 +83,7 @@
         body {
             font-family: 'Manrope', sans-serif;
             background-color: #f9f9f9;
-            min-height: max(884px, 100dvh);
+            min-height: 100dvh;
             overflow-x: hidden;
         }
         .material-symbols-outlined {
@@ -92,82 +92,173 @@
         .luminous-cta {
             background: linear-gradient(135deg, #003278 0%, #0047a5 100%);
         }
+        .view-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
     </style>
 </head>
-<body class="bg-surface text-on-surface flex flex-col items-center justify-between selection:bg-secondary-container selection:text-on-secondary-container antialiased">
-    <!-- Top Navigation -->
-    <header class="w-full flex justify-center pt-24 pb-12">
-        <div class="flex flex-col items-center space-y-4">
+<body class="bg-surface text-on-surface flex flex-col items-center selection:bg-secondary-container selection:text-on-secondary-container antialiased">
+    
+    <!-- LOGIN VIEW -->
+    <div id="loginView" class="w-full flex flex-col items-center view-transition">
+        <header class="w-full flex justify-center pt-24 pb-12">
             <h1 class="text-3xl font-extrabold tracking-tighter text-primary">VocabMaster</h1>
-        </div>
-    </header>
+        </header>
 
-    <main class="w-full max-w-[420px] px-6 flex-grow flex flex-col justify-center pb-12">
-        <!-- Login Form Section -->
-        <div class="space-y-10">
-            <div class="text-center space-y-3">
-                <h2 class="text-[28px] font-bold tracking-tight text-on-surface">Welcome Back</h2>
-                <p class="text-on-surface-variant text-base font-medium">Please enter your details to continue.</p>
-            </div>
-            
-            <form class="space-y-6" onsubmit="event.preventDefault();">
-                <!-- Inputs Container -->
-                <div class="space-y-5">
-                    <div class="relative group">
-                        <input class="w-full h-16 px-6 bg-surface-container-high border-none rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Username" type="text" required/>
+        <main class="w-full max-w-[420px] px-6 flex-grow flex flex-col justify-center pb-12">
+            <div class="space-y-10">
+                <div class="text-center space-y-3">
+                    <h2 class="text-[28px] font-bold tracking-tight text-on-surface">Welcome Back</h2>
+                    <p class="text-on-surface-variant text-base font-medium">Please enter your details to continue.</p>
+                </div>
+                
+                <form class="space-y-6" onsubmit="event.preventDefault();">
+                    <div class="space-y-5">
+                        <div class="relative group">
+                            <input class="w-full h-16 px-6 bg-surface-container-high border-none rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Username" type="text" required/>
+                        </div>
+                        <div class="relative group">
+                            <input id="loginPassword" class="w-full h-16 px-6 bg-surface-container-high border-none rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Password" type="password" required/>
+                            <button onclick="togglePasswordVisibility('loginPassword', 'loginPasswordIcon')" class="absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-primary transition-colors focus:outline-none" type="button">
+                                <span id="loginPasswordIcon" class="material-symbols-outlined text-[24px]">visibility</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="relative group">
-                        <input id="passwordInput" class="w-full h-16 px-6 bg-surface-container-high border-none rounded-2xl text-on-surface text-lg placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Password" type="password" required/>
-                        <button id="togglePassword" class="absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-primary transition-colors focus:outline-none" type="button">
-                            <span class="material-symbols-outlined text-[24px]" id="visibilityIcon">visibility</span>
+
+                    <div class="flex items-center justify-between px-1">
+                        <label class="flex items-center space-x-3 cursor-pointer group">
+                            <input class="peer appearance-none w-6 h-6 border-2 border-outline-variant rounded-lg checked:bg-primary checked:border-primary transition-all cursor-pointer focus:ring-2 focus:ring-primary/20" type="checkbox"/>
+                            <span class="text-base font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">Remember Me</span>
+                        </label>
+                        <a class="text-base font-semibold text-primary hover:text-primary-container transition-colors" href="#">Forgot Password?</a>
+                    </div>
+
+                    <div class="pt-6">
+                        <button type="submit" class="w-full h-16 luminous-cta text-on-primary font-bold rounded-full text-xl tracking-wider shadow-md hover:opacity-95 active:scale-[0.98] transition-all duration-200">
+                            LOGIN
+                        </button>
+                    </div>
+                </form>
+
+                <div class="pt-10 flex justify-center">
+                    <p class="text-base font-medium text-on-surface-variant">Don't have an account? 
+                        <button onclick="showView('registerView')" class="text-primary font-bold hover:underline decoration-2 underline-offset-4 ml-1">Register here</button>
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- REGISTER VIEW -->
+    <div id="registerView" class="hidden w-full flex flex-col items-center view-transition">
+        <header class="fixed top-0 w-full z-50 bg-[#f9f9f9] flex items-center justify-between px-6 h-16 border-b border-outline-variant/10">
+            <button onclick="showView('loginView')" class="flex items-center gap-4 hover:opacity-80 transition-opacity">
+                <span class="material-symbols-outlined text-primary text-[28px]">arrow_back</span>
+            </button>
+            <div class="text-2xl font-extrabold tracking-tighter text-primary">VocabMaster</div>
+            <div class="w-7"></div>
+        </header>
+
+        <main class="w-full max-w-[440px] px-6 pt-24 pb-12 flex flex-col items-center">
+            <div class="mb-10 text-center">
+                <div class="mb-4 flex justify-center">
+                    <span class="material-symbols-outlined text-[64px] text-primary fill-1">menu_book</span>
+                </div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2">Join the Sanctuary</h1>
+                <p class="text-on-surface-variant text-base font-medium">Begin your intellectual journey today</p>
+            </div>
+
+            <form class="w-full space-y-5" onsubmit="event.preventDefault();">
+                <div class="space-y-4">
+                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Full Name" type="text" required/>
+                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" onblur="(this.type='text')" onfocus="(this.type='date')" placeholder="Date of Birth" type="text" required/>
+                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Country" type="text" required/>
+                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Email" type="email" required/>
+                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Phone Number" type="tel" required/>
+                    <input class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Username" type="text" required/>
+                    <div class="relative">
+                        <input id="registerPassword" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Password" type="password" required/>
+                        <button onclick="togglePasswordVisibility('registerPassword', 'registerPasswordIcon')" class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-primary transition-colors focus:outline-none" type="button">
+                            <span id="registerPasswordIcon" class="material-symbols-outlined text-[22px]">visibility</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Options -->
-                <div class="flex items-center justify-between px-1">
-                    <label class="flex items-center space-x-3 cursor-pointer group">
-                        <div class="relative flex items-center">
-                            <input class="peer appearance-none w-6 h-6 border-2 border-outline-variant rounded-lg checked:bg-primary checked:border-primary transition-all cursor-pointer focus:ring-2 focus:ring-primary/20" type="checkbox"/>
-                            <span class="material-symbols-outlined absolute text-white text-[18px] left-1/2 -translate-x-1/2 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none">check</span>
-                        </div>
-                        <span class="text-base font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">Remember Me</span>
-                    </label>
-                    <a class="text-base font-semibold text-primary hover:text-primary-container transition-colors" href="#">Forgot Password?</a>
+                <div class="pt-2 space-y-4">
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-[20px]">public</span>
+                        <select class="w-full h-14 pl-12 pr-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface text-lg appearance-none outline-none">
+                            <option disabled selected>Interface Language</option>
+                            <option>Indonesian</option>
+                            <option>English</option>
+                            <option>Korean</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-[20px]">translate</span>
+                        <select class="w-full h-14 pl-12 pr-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface text-lg appearance-none outline-none">
+                            <option disabled selected>Translate Vocabulary To</option>
+                            <option>Indonesian</option>
+                            <option>English</option>
+                            <option>Korean</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
                 </div>
 
-                <!-- Action Button -->
                 <div class="pt-6">
-                    <button type="submit" class="w-full h-16 luminous-cta text-on-primary font-bold rounded-full text-xl tracking-wider shadow-md hover:opacity-95 active:scale-[0.98] transition-all duration-200">
-                        LOGIN
+                    <button class="w-full h-16 luminous-cta text-white rounded-full font-bold tracking-widest text-lg shadow-md active:scale-[0.98] transition-all duration-200" type="submit">
+                        CREATE ACCOUNT
                     </button>
                 </div>
+                
+                <div class="text-center pt-6">
+                    <p class="text-sm text-on-surface-variant font-medium uppercase tracking-widest">
+                        Already have an account? 
+                        <button onclick="showView('loginView')" class="text-primary font-bold hover:underline ml-1">Login</button>
+                    </p>
+                </div>
             </form>
+        </main>
+    </div>
 
-            <div class="pt-10 flex justify-center">
-                <p class="text-base font-medium text-on-surface-variant">Don't have an account? 
-                    <a class="text-primary font-bold hover:underline decoration-2 underline-offset-4" href="#">Register here</a>
-                </p>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer Section -->
-    <footer class="pb-8">
+    <!-- Footer -->
+    <footer class="pb-8 mt-auto">
         <p class="text-xs text-on-surface-variant/50 font-medium">© 2026 VocabMaster. All rights reserved.</p>
     </footer>
 
     <script>
-        // Simple Password Toggle Logic
-        const passwordInput = document.getElementById('passwordInput');
-        const togglePassword = document.getElementById('togglePassword');
-        const visibilityIcon = document.getElementById('visibilityIcon');
+        function showView(viewId) {
+            const views = ['loginView', 'registerView'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (id === viewId) {
+                    el.classList.remove('hidden');
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, 50);
+                } else {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(10px)';
+                    setTimeout(() => el.classList.add('hidden'), 300);
+                }
+            });
+            window.scrollTo(0, 0);
+        }
 
-        togglePassword.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            visibilityIcon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
-        });
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
     </script>
 </body>
 </html>
