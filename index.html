@@ -316,7 +316,7 @@
             <section class="grid grid-cols-2 gap-4 mb-10">
                 <div class="col-span-2 bg-white p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col items-center justify-center">
                     <span class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">TOTAL CARDS</span>
-                    <span class="text-4xl font-extrabold text-primary tracking-tighter">1,247</span>
+                    <span id="totalCardsCount" class="text-4xl font-extrabold text-primary tracking-tighter">0</span>
                 </div>
                 <div class="bg-white p-5 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
                     <span class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-2 block">WEAK ITEMS</span>
@@ -492,8 +492,24 @@
             const password = document.getElementById('loginPassword').value;
             const errorEl = document.getElementById('loginError');
 
+            let emailToUse = identifier;
+
+            // Logic to support Username/Phone/Email
+            if (!identifier.includes('@')) {
+                // Try searching in profiles table (assuming table 'profiles' exists)
+                const { data: profile, error: profileError } = await _supabase
+                    .from('profiles')
+                    .select('email')
+                    .or(`username.eq.${identifier},phone.eq.${identifier}`)
+                    .single();
+                
+                if (profile) {
+                    emailToUse = profile.email;
+                }
+            }
+
             const { data, error } = await _supabase.auth.signInWithPassword({
-                email: identifier,
+                email: emailToUse,
                 password: password,
             });
 
@@ -505,7 +521,7 @@
                 setTimeout(() => form.style.animation = '', 400);
             } else {
                 currentUser = data.user;
-                userNativeLang = data.user.user_metadata.native_lang || 'en';
+                userNativeLang = data.user.user_metadata.native_language || 'en';
                 errorEl.classList.add('hidden');
                 showView('dashboardView');
                 fetchVocabulary();
@@ -517,23 +533,42 @@
             const formData = new FormData(event.target);
             const email = formData.get('email');
             const password = formData.get('password');
-            const native_lang = formData.get('native_lang');
-            const fullname = formData.get('fullname');
+            
+            // Extract all profile data
+            const profileData = {
+                full_name: formData.get('fullname'),
+                username: formData.get('username'),
+                country: formData.get('country'),
+                phone: formData.get('phone'),
+                native_language: formData.get('native_lang') || 'en',
+                learning_language: formData.get('learn_lang') || 'ko'
+            };
 
+            // 1. Check if Username exists (Validation before Auth)
+            const { data: existingUser } = await _supabase
+                .from('profiles')
+                .select('username')
+                .eq('username', profileData.username)
+                .maybeSingle();
+
+            if (existingUser) {
+                alert('Username sudah terdaftar. Silakan pilih username lain.');
+                return;
+            }
+
+            // 2. Register with Supabase Auth (passing info to options.data for trigger)
             const { data, error } = await _supabase.auth.signUp({
                 email,
                 password,
                 options: {
-                    data: {
-                        fullname,
-                        native_lang: native_lang || 'en'
-                    }
+                    data: profileData
                 }
             });
 
             if (error) {
                 alert("Error registering: " + error.message);
             } else {
+                // Success! Supabase Trigger will handle the profiles table insert
                 showView('successView');
             }
         }
@@ -574,9 +609,10 @@
 
         async function fetchVocabulary() {
             const listEl = document.getElementById('vocabularyList');
+            const totalCardsEl = document.getElementById('totalCardsCount');
             if (!listEl) return;
 
-            const { data, error } = await _supabase
+            const { data, error, count } = await _supabase
                 .from('words')
                 .select(`
                     id,
@@ -585,7 +621,7 @@
                         translated_text,
                         language_code
                     )
-                `)
+                `, { count: 'exact' })
                 .eq('translations.language_code', userNativeLang);
 
             if (error) {
@@ -593,6 +629,9 @@
                 listEl.innerHTML = `<div class="text-center py-10 text-error">Failed to load data.</div>`;
                 return;
             }
+
+            // Update Statistics
+            if (totalCardsEl) totalCardsEl.textContent = count || data.length;
 
             if (data.length === 0) {
                 listEl.innerHTML = `<div class="text-center py-10 opacity-50 italic">No words added for your language yet.</div>`;
@@ -619,7 +658,7 @@
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
-                userNativeLang = session.user.user_metadata.native_lang || 'en';
+                userNativeLang = session.user.user_metadata.native_language || 'en';
                 showView('dashboardView');
                 fetchVocabulary();
             }
