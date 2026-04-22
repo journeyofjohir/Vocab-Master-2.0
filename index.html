@@ -293,9 +293,24 @@
                 <img alt="VocabMaster Logo" class="w-8 h-8 rounded-lg object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0uhv8ZVMfNGOiYIK3AaxpGGIMUye9zsdBFROhtW8CRYIGG6hdGQ7xpnBKRVjt3PmkYOdKpeT05SZlGw-tToprGsI-eDyjSFQKlZJ4E8LqAWu1ggr1nNC6k4pJyhVm5PO1hIoA6qEgWnq-lsOlIHsDTBkbO_lKjaPbgJhTbob7N2PdnANW5hj6GWfUDiJJxUaPfvUH2eU32BEFnJg-OF9s1yVznpa2WNXPOCUdVmiRQ1EWLeMr1NxjFnyTVZeqWViwksuZ7Zu53NUnn0"/>
                 <span class="text-[#1a1c1c] font-bold text-xl tracking-tighter">VocabMaster</span>
             </div>
-            <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors active:opacity-80 active:scale-95 duration-200">
-                <span class="material-symbols-outlined text-[#434652]">settings</span>
-            </button>
+            <div class="relative">
+                <button onclick="toggleSettingsMenu(event)" id="settingsBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors active:opacity-80 active:scale-95 duration-200">
+                    <span class="material-symbols-outlined text-[#434652]">settings</span>
+                </button>
+                <!-- Settings Dropdown -->
+                <div id="settingsMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-outline-variant/30 py-2 z-[60] view-transition" style="opacity: 0; transform: translateY(-10px);">
+                    <button class="w-full text-left px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container transition-colors flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px]">person</span> Account Profile
+                    </button>
+                    <button class="w-full text-left px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container transition-colors flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span> Notifications
+                    </button>
+                    <div class="h-px bg-outline-variant/20 mx-2 my-1"></div>
+                    <button onclick="handleLogout()" class="w-full text-left px-4 py-3 text-sm font-bold text-error hover:bg-error-container/20 transition-colors flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px]">logout</span> Log Out
+                    </button>
+                </div>
+            </div>
         </header>
         
         <main class="max-w-md mx-auto px-6 pt-8 pb-32 w-full">
@@ -661,6 +676,44 @@
                 </div>
             `).join('');
         }
+
+        function toggleSettingsMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('settingsMenu');
+            const isHidden = menu.classList.contains('hidden');
+            
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                setTimeout(() => {
+                    menu.style.opacity = '1';
+                    menu.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                menu.style.opacity = '0';
+                menu.style.transform = 'translateY(-10px)';
+                setTimeout(() => menu.classList.add('hidden'), 300);
+            }
+        }
+
+        async function handleLogout() {
+            const { error } = await _supabase.auth.signOut();
+            if (error) {
+                alert("Error logging out: " + error.message);
+            } else {
+                currentUser = null;
+                showView('loginView');
+            }
+        }
+
+        // Close settings menu when clicking outside
+        window.addEventListener('click', () => {
+            const menu = document.getElementById('settingsMenu');
+            if (menu && !menu.classList.contains('hidden')) {
+                menu.style.opacity = '0';
+                menu.style.transform = 'translateY(-10px)';
+                setTimeout(() => menu.classList.add('hidden'), 300);
+            }
+        });
 
         // Initialize on load
         window.addEventListener('load', async () => {
