@@ -195,7 +195,10 @@
                     <input name="country" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Country" type="text" required/>
                     <input name="email" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Email" type="email" required/>
                     <input name="phone" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Phone Number" type="tel" required/>
-                    <input name="username" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Username" type="text" required/>
+                    <div>
+                        <input id="registerUsername" name="username" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Username" type="text" required/>
+                        <p id="usernameFeedback" class="text-xs mt-1.5 ml-4 font-bold hidden transition-all duration-200"></p>
+                    </div>
                     <div class="relative">
                         <input name="password" id="registerPassword" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface placeholder:text-on-surface-variant text-lg transition-all outline-none" placeholder="Password" type="password" required/>
                         <button onclick="togglePasswordVisibility('registerPassword', 'registerPasswordIcon')" class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-primary transition-colors focus:outline-none" type="button">
@@ -230,7 +233,7 @@
                 </div>
 
                 <div class="pt-6">
-                    <button class="w-full h-16 luminous-cta text-white rounded-full font-bold tracking-widest text-lg shadow-md active:scale-[0.98] transition-all duration-200" type="submit">
+                    <button id="registerSubmitBtn" class="w-full h-16 luminous-cta text-white rounded-full font-bold tracking-widest text-lg shadow-md active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed" type="submit">
                         CREATE ACCOUNT
                     </button>
                 </div>
@@ -322,7 +325,7 @@
                         <div class="text-[10px] font-bold text-on-surface-variant tracking-[0.1em] mt-1 uppercase">Overall Mastery</div>
                     </div>
                 </div>
-                <button class="mt-8 px-10 py-4 luminous-cta text-white font-bold rounded-xl shadow-lg shadow-primary/20 active:scale-95 transition-all duration-200 uppercase tracking-widest text-sm">
+                <button onclick="showView('practiceView')" class="mt-8 px-10 py-4 luminous-cta text-white font-bold rounded-xl shadow-lg shadow-primary/20 active:scale-95 transition-all duration-200 uppercase tracking-widest text-sm">
                     START PRACTICE
                 </button>
             </section>
@@ -402,8 +405,8 @@
 
         <!-- BottomNavBar -->
         <nav class="bg-white/80 backdrop-blur-xl border-t border-[#eeeeee] shadow-[0_-4px_24px_rgba(0,0,0,0.04)] fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 h-20 z-50">
-            <button onclick="showView('dashboardView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group">
-                <span class="material-symbols-outlined text-xl mb-0.5" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+            <button onclick="showView('practiceView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group text-center">
+                <span class="material-symbols-outlined text-xl mb-0.5 group-active:scale-90 duration-200">fitness_center</span>
                 <span class="text-[10px] font-bold uppercase tracking-widest">PRACTICE</span>
             </button>
             <button onclick="showView('dashboardView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group">
@@ -418,6 +421,136 @@
             </button>
             <button onclick="showView('dashboardView')" class="flex flex-col items-center justify-center bg-[#0047a5]/10 text-[#003278] rounded-xl px-3 py-1.5 transition-colors group">
                 <span class="material-symbols-outlined text-xl mb-0.5" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest">DASHBOARD</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- PRACTICE VIEW (Setup Form) -->
+    <div id="practiceView" class="hidden w-full flex flex-col view-transition min-h-screen bg-surface">
+        <header class="bg-[#f9f9f9] border-b border-[#eeeeee] sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+            <button onclick="showView('dashboardView')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                <span class="material-symbols-outlined text-primary text-[28px]">arrow_back</span>
+            </button>
+            <div class="text-2xl font-extrabold tracking-tighter text-primary">Practice</div>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="max-w-lg mx-auto px-6 pt-6 pb-32 w-full flex flex-col items-center">
+            <!-- Academic Cap Icon -->
+            <div class="mb-4">
+                <span class="material-symbols-outlined text-[64px] text-[#0047a5] fill-1">school</span>
+            </div>
+            <!-- Hero Text -->
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-extrabold text-[#1a1c1c] tracking-tight mb-2">Start Practice Session</h2>
+                <p class="text-on-surface-variant font-medium">Configure your filters to generate a custom worksheet.</p>
+            </div>
+            <!-- Setup Form -->
+            <div class="w-full space-y-5">
+                <!-- MODE Dropdown -->
+                <div class="flex flex-col">
+                    <label class="font-bold tracking-[0.1em] text-[#808080] mb-2 text-[10px] uppercase ml-1">MODE</label>
+                    <div class="relative">
+                        <select id="practiceModeSelect" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface font-semibold text-base appearance-none outline-none pr-12">
+                            <option value="ko_to_native">Korean -> Native</option>
+                            <option value="native_to_ko">Native -> Korean</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+                <!-- LEVEL Dropdown -->
+                <div class="flex flex-col">
+                    <label class="font-bold tracking-[0.1em] text-[#808080] mb-2 text-[10px] uppercase ml-1">LEVEL</label>
+                    <div class="relative">
+                        <select id="practiceLevelSelect" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface font-semibold text-base appearance-none outline-none pr-12">
+                            <option>Intermediate (B2)</option>
+                            <option>Beginner (A1)</option>
+                            <option>Elementary (A2)</option>
+                            <option>Upper Intermediate (B1)</option>
+                            <option>Advanced (C1)</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+                <!-- ITEMS PER PAGE Dropdown -->
+                <div class="flex flex-col">
+                    <label class="font-bold tracking-[0.1em] text-[#808080] mb-2 text-[10px] uppercase ml-1">ITEMS PER PAGE</label>
+                    <div class="relative">
+                        <select id="practiceItemsSelect" onchange="handleItemsChange(this.value)" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface font-semibold text-base appearance-none outline-none pr-12">
+                            <option value="10">10 Words</option>
+                            <option value="20">20 Words</option>
+                            <option value="30">30 Words</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
+                    <!-- Custom Items Input -->
+                    <div id="customItemsContainer" class="hidden mt-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <input id="customItemsInput" type="number" placeholder="Enter word count" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface font-semibold text-base outline-none"/>
+                    </div>
+                </div>
+                <!-- CHAPTER Dropdown -->
+                <div class="flex flex-col">
+                    <label class="font-bold tracking-[0.1em] text-[#808080] mb-2 text-[10px] uppercase ml-1">CHAPTER</label>
+                    <div class="relative">
+                        <select id="practiceChapterSelect" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface font-semibold text-base appearance-none outline-none pr-12">
+                            <option>Unit 4: Professional Environment</option>
+                            <option>Unit 1: Fundamentals</option>
+                            <option>Unit 2: Social Interactions</option>
+                            <option>Unit 3: Travel & Culture</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+                <!-- PRACTICE TYPE Dropdown -->
+                <div class="flex flex-col">
+                    <label class="font-bold tracking-[0.1em] text-[#808080] mb-2 text-[10px] uppercase ml-1">PRACTICE TYPE</label>
+                    <div class="relative">
+                        <select id="practiceTypeSelect" onchange="handleTypeChange(this.value)" class="w-full h-14 px-5 bg-surface-container rounded-2xl border-none focus:ring-2 focus:ring-primary text-on-surface font-semibold text-base appearance-none outline-none pr-12">
+                            <option value="random">Random Mix</option>
+                            <option value="weakest">Weakest Card First</option>
+                            <option value="focus_weakness">Focus on Weakness</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    </div>
+                    <!-- Weakness Slider -->
+                    <div id="weaknessControl" class="hidden mt-5 p-5 bg-primary/5 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-primary italic uppercase tracking-wider">Target Mastery Threshold</span>
+                            <span id="weaknessVal" class="text-xl font-black text-primary underline decoration-2 underline-offset-4">50%</span>
+                        </div>
+                        <input id="weaknessSlider" oninput="updateWeaknessVal(this.value)" type="range" min="10" max="90" value="50" class="w-full h-2 bg-outline-variant/30 rounded-lg appearance-none cursor-pointer accent-primary"/>
+                        <p class="text-[10px] text-on-surface-variant/70 font-medium">Practicing words below this mastery percentage.</p>
+                    </div>
+                </div>
+                <!-- Action Button -->
+                <div class="pt-4">
+                    <button onclick="generateWorksheet()" class="w-full h-16 luminous-cta text-white font-bold rounded-2xl text-lg hover:opacity-90 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 tracking-widest">
+                        GENERATE WORKSHEET
+                        <span class="material-symbols-outlined text-xl">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+        <!-- Bottom Nav for Practice -->
+        <nav class="bg-white/80 backdrop-blur-xl border-t border-[#eeeeee] shadow-[0_-4px_24px_rgba(0,0,0,0.04)] fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 h-20 z-50">
+            <button onclick="showView('practiceView')" class="flex flex-col items-center justify-center bg-[#0047a5]/10 text-[#003278] rounded-xl px-3 py-1.5 transition-colors group">
+                <span class="material-symbols-outlined text-xl mb-0.5" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest">PRACTICE</span>
+            </button>
+            <button onclick="showView('dashboardView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group">
+                <span class="material-symbols-outlined text-xl mb-0.5">book</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest">DICTIONARY</span>
+            </button>
+            <button onclick="showView('addView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group">
+                <div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-white shadow-lg -mt-10 mb-1 transition-transform group-active:scale-90">
+                    <span class="material-symbols-outlined text-2xl">add</span>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-widest">ADD</span>
+            </button>
+            <button onclick="showView('dashboardView')" class="flex flex-col items-center justify-center text-[#434652] px-3 py-1.5 hover:text-[#003278] transition-colors group">
+                <span class="material-symbols-outlined text-xl mb-0.5">grid_view</span>
                 <span class="text-[10px] font-bold uppercase tracking-widest">DASHBOARD</span>
             </button>
         </nav>
@@ -473,7 +606,7 @@
         let userNativeLang = 'en';
 
         function showView(viewId) {
-            const views = ['loginView', 'registerView', 'successView', 'successView', 'dashboardView', 'addView'];
+            const views = ['loginView', 'registerView', 'successView', 'successView', 'dashboardView', 'addView', 'practiceView'];
             const footer = document.getElementById('mainFooter');
             
             views.forEach(id => {
@@ -492,8 +625,11 @@
                 }
             });
 
-            if (viewId === 'dashboardView' || viewId === 'addView') {
+            if (viewId === 'dashboardView' || viewId === 'addView' || viewId === 'practiceView') {
                 footer.classList.add('hidden');
+                if (viewId === 'practiceView') {
+                    updatePracticeModeOptions();
+                }
             } else {
                 footer.classList.remove('hidden');
             }
@@ -705,6 +841,54 @@
             }
         }
 
+        function updatePracticeModeOptions() {
+            const langMap = {
+                'id': 'Indonesian',
+                'en': 'English',
+                'ru': 'Russian',
+                'th': 'Thai',
+                'es': 'Spanish',
+                'zh': 'Chinese',
+                'tr': 'Turkish'
+            };
+            const nativeLangName = langMap[userNativeLang] || 'Native';
+            const modeSelect = document.getElementById('practiceModeSelect');
+            if (modeSelect) {
+                modeSelect.innerHTML = `
+                    <option value="ko_to_native">Korean -> ${nativeLangName}</option>
+                    <option value="native_to_ko">${nativeLangName} -> Korean</option>
+                `;
+            }
+        }
+
+        function handleItemsChange(val) {
+            const container = document.getElementById('customItemsContainer');
+            if (val === 'custom') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function handleTypeChange(val) {
+            const control = document.getElementById('weaknessControl');
+            if (val === 'focus_weakness') {
+                control.classList.remove('hidden');
+            } else {
+                control.classList.add('hidden');
+            }
+        }
+
+        function updateWeaknessVal(val) {
+            document.getElementById('weaknessVal').textContent = val + '%';
+        }
+
+        function generateWorksheet() {
+            // Placeholder untuk transisi ke Tampilan 2
+            alert("Generating Worksheet...");
+            // showView('worksheetView'); // Nanti diaktivasi di tahap berikutnya
+        }
+
         // Close settings menu when clicking outside
         window.addEventListener('click', () => {
             const menu = document.getElementById('settingsMenu');
@@ -748,6 +932,53 @@
             }
         `;
         document.head.appendChild(style);
+
+        // REAL-TIME USERNAME VALIDATION
+        const registerUsername = document.getElementById('registerUsername');
+        const usernameFeedback = document.getElementById('usernameFeedback');
+        const registerSubmitBtn = document.getElementById('registerSubmitBtn');
+
+        function debounce(func, timeout = 500) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
+
+        const checkUsernameAvailability = debounce(async (username) => {
+            if (!username || username.length < 3) {
+                usernameFeedback.classList.add('hidden');
+                registerSubmitBtn.disabled = false;
+                return;
+            }
+
+            const { data, error } = await _supabase
+                .from('profiles')
+                .select('username')
+                .eq('username', username)
+                .maybeSingle();
+
+            usernameFeedback.classList.remove('hidden');
+            
+            if (data) {
+                // Username taken
+                usernameFeedback.textContent = 'Username already taken';
+                usernameFeedback.style.color = '#ba1a1a'; // error color
+                registerSubmitBtn.disabled = true;
+            } else {
+                // Username available
+                usernameFeedback.textContent = 'Username available';
+                usernameFeedback.style.color = '#22c55e'; // green-500
+                registerSubmitBtn.disabled = false;
+            }
+        });
+
+        if (registerUsername) {
+            registerUsername.addEventListener('input', (e) => {
+                checkUsernameAvailability(e.target.value);
+            });
+        }
     </script>
 </body>
 </html>
