@@ -494,17 +494,23 @@
 
             let emailToUse = identifier;
 
-            // Logic to support Username/Phone/Email
+            // Jika input bukan email (tidak ada '@'), maka anggap sebagai username
             if (!identifier.includes('@')) {
-                // Try searching in profiles table (assuming table 'profiles' exists)
                 const { data: profile, error: profileError } = await _supabase
                     .from('profiles')
                     .select('email')
-                    .or(`username.eq.${identifier},phone.eq.${identifier}`)
-                    .single();
+                    .eq('username', identifier)
+                    .maybeSingle();
                 
                 if (profile) {
                     emailToUse = profile.email;
+                } else {
+                    errorEl.textContent = 'Username atau Email tidak ditemukan';
+                    errorEl.classList.remove('hidden');
+                    const form = event.target;
+                    form.style.animation = 'shake 0.4s ease-in-out';
+                    setTimeout(() => form.style.animation = '', 400);
+                    return;
                 }
             }
 
@@ -514,7 +520,10 @@
             });
 
             if (error) {
-                errorEl.textContent = error.message;
+                // Berikan pesan yang lebih spesifik jika password salah
+                errorEl.textContent = error.message === 'Invalid login credentials' 
+                    ? 'Password yang Anda masukkan salah' 
+                    : error.message;
                 errorEl.classList.remove('hidden');
                 const form = event.target;
                 form.style.animation = 'shake 0.4s ease-in-out';
